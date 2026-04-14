@@ -71,7 +71,14 @@ class SupremeCourtScraper:
 
     def __init__(self) -> None:
         self.session = requests.Session()
-        self.session.headers.update({"User-Agent": config.USER_AGENT})
+        self.session.headers.update(
+            {
+                "User-Agent": config.USER_AGENT,
+                "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+                "Accept-Language": "en-US,en;q=0.9",
+                "Connection": "keep-alive",
+            }
+        )
 
         self.progress = self.load_progress()
         self.processed_case_urls: Set[str] = set(self.progress.get("processed_case_urls", []))
@@ -218,6 +225,12 @@ class SupremeCourtScraper:
             year_links[year] = urljoin(config.BASE_BROWSE_URL, href)
 
         return dict(sorted(year_links.items()))
+
+    @staticmethod
+    def build_year_url(year: int) -> str:
+        """Build canonical Supreme Court browse URL for a given year."""
+        base = config.BASE_BROWSE_URL.rstrip("/")
+        return f"{base}/{year}/"
 
     def get_entire_year_url(self, year_url: str) -> Optional[str]:
         """From a year page, find the 'Entire Year' link."""
@@ -521,21 +534,22 @@ def main() -> None:
         logging.info("Retry-failed mode complete")
         return
 
-    year_links = scraper.extract_year_links()
-    if not year_links:
-        logging.error("Could not discover year links. Exiting.")
-        return
-
     target_years = determine_target_years(args, scraper)
     if not target_years:
         logging.info("No target years to process.")
         return
 
+    year_links = scraper.extract_year_links()
+    if year_links:
+        logging.info("Discovered %s year links from browse page", len(year_links))
+    else:
+        logging.warning(
+            "Could not discover year links from %s. Falling back to direct year URLs.",
+            config.BASE_BROWSE_URL,
+        )
+
     for year in target_years:
-        year_url = year_links.get(year)
-        if not year_url:
-            logging.warning("Year %s not present on browse page. Skipping.", year)
-            continue
+        year_url = year_links.get(year) or scraper.build_year_url(year)
 
         scraper.scrape_year(year, year_url)
 
