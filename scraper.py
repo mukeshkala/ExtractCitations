@@ -497,6 +497,14 @@ def parse_args() -> argparse.Namespace:
         action="store_true",
         help="Retry only failed case URLs from failed_cases.csv",
     )
+    parser.add_argument(
+        "--skip-year-discovery",
+        action="store_true",
+        help=(
+            "Skip loading the browse root page and use direct year URLs only. "
+            "Useful when the root page returns 403."
+        ),
+    )
 
     return parser.parse_args()
 
@@ -539,14 +547,20 @@ def main() -> None:
         logging.info("No target years to process.")
         return
 
-    year_links = scraper.extract_year_links()
-    if year_links:
-        logging.info("Discovered %s year links from browse page", len(year_links))
-    else:
-        logging.warning(
-            "Could not discover year links from %s. Falling back to direct year URLs.",
-            config.BASE_BROWSE_URL,
+    year_links: Dict[int, str] = {}
+    if args.skip_year_discovery:
+        logging.info(
+            "Skipping browse root discovery by CLI flag; using direct year URLs only."
         )
+    else:
+        year_links = scraper.extract_year_links()
+        if year_links:
+            logging.info("Discovered %s year links from browse page", len(year_links))
+        else:
+            logging.warning(
+                "Could not discover year links from %s. Falling back to direct year URLs.",
+                config.BASE_BROWSE_URL,
+            )
 
     for year in target_years:
         year_url = year_links.get(year) or scraper.build_year_url(year)

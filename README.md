@@ -76,6 +76,7 @@ python scraper.py --years 1950 1951 1952
 python scraper.py --start-year 1950 --end-year 1955
 python scraper.py --resume
 python scraper.py --retry-failed
+python scraper.py --years 1950 --skip-year-discovery
 ```
 
 ## Batch execution modes
@@ -146,6 +147,14 @@ Some environments may receive `403 Forbidden` for:
 - `https://indiankanoon.org/browse/supremecourt/`
 
 The scraper now falls back to direct year URLs (for example, `.../browse/supremecourt/1950/`) so a blocked root browse page does not stop normal year-based runs.
+
+If you want to avoid requesting the root browse page completely, run with:
+
+```bash
+python scraper.py --years 1950 --skip-year-discovery
+```
+
+Keeping a browser tab open does not help this script because it uses its own `requests.Session` (separate cookies/session from your browser).
 
 ## Config customization
 
