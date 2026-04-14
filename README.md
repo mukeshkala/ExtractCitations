@@ -139,6 +139,14 @@ This makes repeated runs safe.
 
 The scraper removes common judgment-body containers (`pre`, judgment text blocks, etc.) before text parsing, so extraction focuses on metadata above the content rectangle.
 
+## 403 handling on browse root page
+
+Some environments may receive `403 Forbidden` for:
+
+- `https://indiankanoon.org/browse/supremecourt/`
+
+The scraper now falls back to direct year URLs (for example, `.../browse/supremecourt/1950/`) so a blocked root browse page does not stop normal year-based runs.
+
 ## Config customization
 
 Edit `config.py` for defaults such as:
