@@ -1,0 +1,142 @@
+2026-04-14 12:04:58,919 | INFO | Scraper started
+2026-04-14 12:04:58,980 | WARNING | Request failed (attempt 1/4): https://indiankanoon.org/browse/supremecourt/ | sleeping 2.0s
+2026-04-14 12:05:01,032 | WARNING | Request failed (attempt 2/4): https://indiankanoon.org/browse/supremecourt/ | sleeping 4.0s
+2026-04-14 12:05:05,088 | WARNING | Request failed (attempt 3/4): https://indiankanoon.org/browse/supremecourt/ | sleeping 8.0s
+2026-04-14 12:05:13,137 | WARNING | Request failed (attempt 4/4): https://indiankanoon.org/browse/supremecourt/ | sleeping 16.0s
+2026-04-14 12:05:29,193 | ERROR | Request failed permanently: https://indiankanoon.org/browse/supremecourt/ | 403 Client Error: Forbidden for url: https://indiankanoon.org/browse/supremecourt/
+2026-04-14 12:05:29,194 | ERROR | Could not discover year links. Exiting.
+2026-04-14 12:06:54,102 | INFO | Scraper started
+2026-04-14 12:06:54,138 | WARNING | Request failed (attempt 1/4): https://indiankanoon.org/browse/supremecourt/ | sleeping 2.0s
+2026-04-14 12:06:56,183 | WARNING | Request failed (attempt 2/4): https://indiankanoon.org/browse/supremecourt/ | sleeping 4.0s
+2026-04-14 12:07:00,225 | WARNING | Request failed (attempt 3/4): https://indiankanoon.org/browse/supremecourt/ | sleeping 8.0s
+2026-04-14 12:07:08,280 | WARNING | Request failed (attempt 4/4): https://indiankanoon.org/browse/supremecourt/ | sleeping 16.0s
+2026-04-14 12:07:24,324 | ERROR | Request failed permanently: https://indiankanoon.org/browse/supremecourt/ | 403 Client Error: Forbidden for url: https://indiankanoon.org/browse/supremecourt/
+2026-04-14 12:07:24,324 | ERROR | Could not discover year links. Exiting.
+2026-04-14 14:12:39,494 | INFO | Scraper started
+2026-04-14 14:12:39,558 | WARNING | Request failed (attempt 1/4): https://indiankanoon.org/browse/supremecourt/ | sleeping 2.0s
+2026-04-14 14:12:41,599 | WARNING | Request failed (attempt 2/4): https://indiankanoon.org/browse/supremecourt/ | sleeping 4.0s
+2026-04-14 14:12:45,683 | WARNING | Request failed (attempt 3/4): https://indiankanoon.org/browse/supremecourt/ | sleeping 8.0s
+2026-04-14 14:12:53,723 | WARNING | Request failed (attempt 4/4): https://indiankanoon.org/browse/supremecourt/ | sleeping 16.0s
+2026-04-14 14:13:09,765 | ERROR | Request failed permanently: https://indiankanoon.org/browse/supremecourt/ | 403 Client Error: Forbidden for url: https://indiankanoon.org/browse/supremecourt/
+2026-04-14 14:13:09,765 | WARNING | Could not discover year links from https://indiankanoon.org/browse/supremecourt/. Falling back to direct year URLs.
+2026-04-14 14:13:09,765 | INFO | Starting year: 1950
+2026-04-14 14:13:09,801 | WARNING | Request failed (attempt 1/4): https://indiankanoon.org/browse/supremecourt/1950/ | sleeping 2.0s
+2026-04-14 14:13:11,843 | WARNING | Request failed (attempt 2/4): https://indiankanoon.org/browse/supremecourt/1950/ | sleeping 4.0s
+2026-04-14 14:13:15,881 | WARNING | Request failed (attempt 3/4): https://indiankanoon.org/browse/supremecourt/1950/ | sleeping 8.0s
+2026-04-14 14:13:23,927 | WARNING | Request failed (attempt 4/4): https://indiankanoon.org/browse/supremecourt/1950/ | sleeping 16.0s
+2026-04-14 14:13:39,973 | ERROR | Request failed permanently: https://indiankanoon.org/browse/supremecourt/1950/ | 403 Client Error: Forbidden for url: https://indiankanoon.org/browse/supremecourt/1950/
+2026-04-14 14:13:39,974 | INFO | Completed year: 1950 | cases visited: 0
+2026-04-14 14:13:39,974 | INFO | Scraper finished
+2026-04-14 14:29:28,751 | INFO | Scraper started
+2026-04-14 14:29:28,794 | WARNING | Request failed (attempt 1/4): https://indiankanoon.org/browse/supremecourt/ | sleeping 2.0s
+2026-04-14 14:29:30,846 | WARNING | Request failed (attempt 2/4): https://indiankanoon.org/browse/supremecourt/ | sleeping 4.0s
+2026-04-14 14:29:34,890 | WARNING | Request failed (attempt 3/4): https://indiankanoon.org/browse/supremecourt/ | sleeping 8.0s
+2026-04-14 14:29:42,939 | WARNING | Request failed (attempt 4/4): https://indiankanoon.org/browse/supremecourt/ | sleeping 16.0s
+2026-04-14 14:29:58,985 | ERROR | Request failed permanently: https://indiankanoon.org/browse/supremecourt/ | 403 Client Error: Forbidden for url: https://indiankanoon.org/browse/supremecourt/
+2026-04-14 14:29:58,986 | WARNING | Could not discover year links from https://indiankanoon.org/browse/supremecourt/. Falling back to direct year URLs.
+2026-04-14 14:29:58,986 | INFO | Starting year: 1950
+2026-04-14 14:29:59,024 | WARNING | Request failed (attempt 1/4): https://indiankanoon.org/browse/supremecourt/1950/ | sleeping 2.0s
+2026-04-14 14:30:01,079 | WARNING | Request failed (attempt 2/4): https://indiankanoon.org/browse/supremecourt/1950/ | sleeping 4.0s
+2026-04-14 14:30:05,118 | WARNING | Request failed (attempt 3/4): https://indiankanoon.org/browse/supremecourt/1950/ | sleeping 8.0s
+2026-04-19 09:01:33,665 | INFO | Scraper started
+2026-04-19 09:01:33,733 | WARNING | Request failed (attempt 1/4): https://indiankanoon.org/browse/supremecourt/ | sleeping 2.0s
+2026-04-19 09:01:35,781 | WARNING | Request failed (attempt 2/4): https://indiankanoon.org/browse/supremecourt/ | sleeping 4.0s
+2026-04-19 09:01:39,841 | WARNING | Request failed (attempt 3/4): https://indiankanoon.org/browse/supremecourt/ | sleeping 8.0s
+2026-04-19 09:01:47,896 | WARNING | Request failed (attempt 4/4): https://indiankanoon.org/browse/supremecourt/ | sleeping 16.0s
+2026-04-19 09:02:03,943 | ERROR | Request failed permanently: https://indiankanoon.org/browse/supremecourt/ | 403 Client Error: Forbidden for url: https://indiankanoon.org/browse/supremecourt/
+2026-04-19 09:02:03,943 | WARNING | Could not discover year links from https://indiankanoon.org/browse/supremecourt/. Falling back to direct year URLs.
+2026-04-19 09:02:03,944 | INFO | Starting year: 1950
+2026-04-19 09:02:03,983 | WARNING | Request failed (attempt 1/4): https://indiankanoon.org/browse/supremecourt/1950/ | sleeping 2.0s
+2026-04-19 09:02:06,030 | WARNING | Request failed (attempt 2/4): https://indiankanoon.org/browse/supremecourt/1950/ | sleeping 4.0s
+2026-04-19 09:02:10,069 | WARNING | Request failed (attempt 3/4): https://indiankanoon.org/browse/supremecourt/1950/ | sleeping 8.0s
+2026-04-19 09:02:18,114 | WARNING | Request failed (attempt 4/4): https://indiankanoon.org/browse/supremecourt/1950/ | sleeping 16.0s
+2026-04-19 09:02:34,152 | ERROR | Request failed permanently: https://indiankanoon.org/browse/supremecourt/1950/ | 403 Client Error: Forbidden for url: https://indiankanoon.org/browse/supremecourt/1950/
+2026-04-19 09:02:34,154 | INFO | Completed year: 1950 | cases visited: 0
+2026-04-19 09:02:34,154 | INFO | Scraper finished
+2026-04-19 09:13:26,554 | INFO | Starting warm-up flow with 2 URL(s)
+2026-04-19 09:13:26,600 | INFO | Warm-up request 1/2: https://indiankanoon.org/ -> HTTP 403
+2026-04-19 09:13:28,025 | INFO | Warm-up request 2/2: https://indiankanoon.org/browse/supremecourt/ -> HTTP 403
+2026-04-19 09:13:29,391 | INFO | Scraper started
+2026-04-19 09:13:29,429 | WARNING | Request failed (attempt 1/4): https://indiankanoon.org/browse/supremecourt/ | sleeping 2.0s
+2026-04-19 09:13:31,473 | WARNING | Request failed (attempt 2/4): https://indiankanoon.org/browse/supremecourt/ | sleeping 4.0s
+2026-04-19 09:13:35,520 | WARNING | Request failed (attempt 3/4): https://indiankanoon.org/browse/supremecourt/ | sleeping 8.0s
+2026-04-19 09:13:43,563 | WARNING | Request failed (attempt 4/4): https://indiankanoon.org/browse/supremecourt/ | sleeping 16.0s
+2026-04-19 09:13:59,615 | ERROR | Request failed permanently: https://indiankanoon.org/browse/supremecourt/ | 403 Client Error: Forbidden for url: https://indiankanoon.org/browse/supremecourt/
+2026-04-19 09:13:59,615 | WARNING | Could not discover year links from https://indiankanoon.org/browse/supremecourt/. Falling back to direct year URLs.
+2026-04-19 09:13:59,616 | INFO | Starting year: 1950
+2026-04-19 09:13:59,651 | WARNING | Request failed (attempt 1/4): https://indiankanoon.org/browse/supremecourt/1950/ | sleeping 2.0s
+2026-04-19 09:14:01,700 | WARNING | Request failed (attempt 2/4): https://indiankanoon.org/browse/supremecourt/1950/ | sleeping 4.0s
+2026-04-19 09:14:05,738 | WARNING | Request failed (attempt 3/4): https://indiankanoon.org/browse/supremecourt/1950/ | sleeping 8.0s
+2026-04-19 09:14:13,784 | WARNING | Request failed (attempt 4/4): https://indiankanoon.org/browse/supremecourt/1950/ | sleeping 16.0s
+2026-04-19 09:14:29,836 | ERROR | Request failed permanently: https://indiankanoon.org/browse/supremecourt/1950/ | 403 Client Error: Forbidden for url: https://indiankanoon.org/browse/supremecourt/1950/
+2026-04-19 09:14:29,838 | INFO | Completed year: 1950 | cases visited: 0
+2026-04-19 09:14:29,838 | INFO | Scraper finished
+2026-04-19 09:25:14,648 | INFO | Starting warm-up flow with 2 URL(s)
+2026-04-19 09:25:14,688 | INFO | Warm-up request 1/2: https://indiankanoon.org/ -> HTTP 403
+2026-04-19 09:25:15,575 | INFO | Warm-up request 2/2: https://indiankanoon.org/browse/supremecourt/ -> HTTP 403
+2026-04-19 09:25:17,344 | INFO | Scraper started
+2026-04-19 09:25:17,345 | INFO | Skipping browse root discovery by CLI flag; using direct year URLs only.
+2026-04-19 09:25:17,345 | INFO | Starting year: 1950
+2026-04-19 09:25:17,382 | WARNING | Request failed (attempt 1/4): https://indiankanoon.org/browse/supremecourt/1950/ | sleeping 2.0s
+2026-04-19 09:25:19,425 | WARNING | Request failed (attempt 2/4): https://indiankanoon.org/browse/supremecourt/1950/ | sleeping 4.0s
+2026-04-19 09:25:23,476 | WARNING | Request failed (attempt 3/4): https://indiankanoon.org/browse/supremecourt/1950/ | sleeping 8.0s
+2026-04-19 09:25:31,520 | WARNING | Request failed (attempt 4/4): https://indiankanoon.org/browse/supremecourt/1950/ | sleeping 16.0s
+2026-04-19 09:25:47,566 | ERROR | Request failed permanently: https://indiankanoon.org/browse/supremecourt/1950/ | 403 Client Error: Forbidden for url: https://indiankanoon.org/browse/supremecourt/1950/
+2026-04-19 09:25:47,568 | INFO | Completed year: 1950 | cases visited: 0
+2026-04-19 09:25:47,568 | INFO | Scraper finished
+2026-04-19 18:48:22,116 | INFO | Fetch mode: requests
+2026-04-19 18:48:22,116 | INFO | Starting warm-up flow with 2 URL(s)
+2026-04-19 18:48:22,184 | INFO | Warm-up request 1/2: https://indiankanoon.org/ -> HTTP 403
+2026-04-19 18:48:23,495 | INFO | Warm-up request 2/2: https://indiankanoon.org/browse/supremecourt/ -> HTTP 403
+2026-04-19 18:48:24,694 | INFO | Scraper started
+2026-04-19 18:48:24,731 | WARNING | Request failed (attempt 1/4): https://indiankanoon.org/browse/supremecourt/ | sleeping 2.0s
+2026-04-19 18:48:26,781 | WARNING | Request failed (attempt 2/4): https://indiankanoon.org/browse/supremecourt/ | sleeping 4.0s
+2026-04-19 18:48:30,828 | WARNING | Request failed (attempt 3/4): https://indiankanoon.org/browse/supremecourt/ | sleeping 8.0s
+2026-04-19 18:48:38,878 | WARNING | Request failed (attempt 4/4): https://indiankanoon.org/browse/supremecourt/ | sleeping 16.0s
+2026-04-19 18:48:54,935 | ERROR | Request failed permanently: https://indiankanoon.org/browse/supremecourt/ | 403 Client Error: Forbidden for url: https://indiankanoon.org/browse/supremecourt/
+2026-04-19 18:48:54,936 | WARNING | Could not discover year links from https://indiankanoon.org/browse/supremecourt/. Falling back to direct year URLs.
+2026-04-19 18:48:54,936 | INFO | Starting year: 1950
+2026-04-19 18:48:54,974 | WARNING | Request failed (attempt 1/4): https://indiankanoon.org/browse/supremecourt/1950/ | sleeping 2.0s
+2026-04-19 18:48:57,098 | WARNING | Request failed (attempt 2/4): https://indiankanoon.org/browse/supremecourt/1950/ | sleeping 4.0s
+2026-04-19 18:57:05,623 | INFO | Fetch mode: requests
+2026-04-19 18:57:05,623 | INFO | Starting warm-up flow with 2 URL(s)
+2026-04-19 18:57:05,684 | INFO | Warm-up request 1/2: https://indiankanoon.org/ -> HTTP 403
+2026-04-19 18:57:06,756 | INFO | Warm-up request 2/2: https://indiankanoon.org/browse/supremecourt/ -> HTTP 403
+2026-04-19 18:57:08,837 | INFO | Scraper started
+2026-04-19 18:57:08,875 | WARNING | Request failed (attempt 1/4): https://indiankanoon.org/browse/supremecourt/ | sleeping 2.0s
+2026-04-19 18:57:10,925 | WARNING | Request failed (attempt 2/4): https://indiankanoon.org/browse/supremecourt/ | sleeping 4.0s
+2026-04-19 18:57:14,971 | WARNING | Request failed (attempt 3/4): https://indiankanoon.org/browse/supremecourt/ | sleeping 8.0s
+2026-04-19 18:57:23,016 | WARNING | Request failed (attempt 4/4): https://indiankanoon.org/browse/supremecourt/ | sleeping 16.0s
+2026-04-19 18:57:39,062 | ERROR | Request failed permanently: https://indiankanoon.org/browse/supremecourt/ | 403 Client Error: Forbidden for url: https://indiankanoon.org/browse/supremecourt/
+2026-04-19 18:57:39,063 | WARNING | Could not discover year links from https://indiankanoon.org/browse/supremecourt/. Falling back to direct year URLs.
+2026-04-19 18:57:39,063 | INFO | Starting year: 1950
+2026-04-19 18:57:39,103 | WARNING | Request failed (attempt 1/4): https://indiankanoon.org/browse/supremecourt/1950/ | sleeping 2.0s
+2026-04-19 18:57:41,152 | WARNING | Request failed (attempt 2/4): https://indiankanoon.org/browse/supremecourt/1950/ | sleeping 4.0s
+2026-04-19 18:57:45,193 | WARNING | Request failed (attempt 3/4): https://indiankanoon.org/browse/supremecourt/1950/ | sleeping 8.0s
+2026-04-19 18:57:53,244 | WARNING | Request failed (attempt 4/4): https://indiankanoon.org/browse/supremecourt/1950/ | sleeping 16.0s
+2026-04-19 18:58:09,293 | ERROR | Request failed permanently: https://indiankanoon.org/browse/supremecourt/1950/ | 403 Client Error: Forbidden for url: https://indiankanoon.org/browse/supremecourt/1950/
+2026-04-19 18:58:09,293 | INFO | Completed year: 1950 | cases visited: 0
+2026-04-19 18:58:09,293 | INFO | Scraper finished
+2026-04-19 18:58:48,108 | INFO | Fetch mode: playwright | headless=True
+2026-04-19 18:58:48,108 | INFO | Starting warm-up flow with 2 URL(s)
+2026-04-19 18:58:53,211 | INFO | Warm-up request 1/2: https://indiankanoon.org/ -> HTTP 403
+2026-04-19 18:58:59,627 | INFO | Warm-up request 2/2: https://indiankanoon.org/browse/supremecourt/ -> HTTP 403
+2026-04-19 18:59:01,066 | INFO | Scraper started
+2026-04-19 18:59:01,067 | INFO | Skipping browse root discovery by CLI flag; using direct year URLs only.
+2026-04-19 18:59:01,067 | INFO | Starting year: 1950
+2026-04-19 18:59:06,101 | WARNING | Request failed (attempt 1/4): https://indiankanoon.org/browse/supremecourt/1950/ | sleeping 2.0s
+2026-04-19 18:59:13,142 | WARNING | Request failed (attempt 2/4): https://indiankanoon.org/browse/supremecourt/1950/ | sleeping 4.0s
+2026-04-19 18:59:22,184 | WARNING | Request failed (attempt 3/4): https://indiankanoon.org/browse/supremecourt/1950/ | sleeping 8.0s
+2026-04-19 18:59:35,231 | WARNING | Request failed (attempt 4/4): https://indiankanoon.org/browse/supremecourt/1950/ | sleeping 16.0s
+2026-04-19 18:59:56,273 | ERROR | Request failed permanently: https://indiankanoon.org/browse/supremecourt/1950/ | 403 Client Error:  for url: https://indiankanoon.org/browse/supremecourt/1950/
+2026-04-19 18:59:56,273 | INFO | Completed year: 1950 | cases visited: 0
+2026-04-19 18:59:56,273 | INFO | Scraper finished
+2026-04-19 19:03:35,289 | INFO | Fetch mode: playwright | headless=False | channel=msedge | persistent=True
+2026-04-19 19:03:35,289 | INFO | Starting warm-up flow with 2 URL(s)
+2026-04-19 19:03:40,452 | WARNING | Playwright received HTTP 403 for https://indiankanoon.org/. Complete any manual challenge in the browser window, then press Enter to continue.
+2026-04-19 19:05:13,503 | INFO | Warm-up request 1/2: https://indiankanoon.org/ -> HTTP 403
+2026-04-19 19:08:31,999 | INFO | Fetch mode: playwright | headless=False | channel=chromium | persistent=False
+2026-04-19 19:08:31,999 | INFO | Scraper started
+2026-04-19 19:08:31,999 | INFO | Skipping browse root discovery by CLI flag; using direct year URLs only.
+2026-04-19 19:08:31,999 | INFO | Starting year: 1950
+2026-04-19 19:08:37,681 | WARNING | Playwright received HTTP 403 for https://indiankanoon.org/browse/supremecourt/1950/. Complete any manual challenge in the browser window, then press Enter to continue.

@@ -21,11 +21,12 @@ import argparse
 import csv
 import json
 import logging
+import random
 import re
 import time
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Dict, Iterable, List, Optional, Set, Tuple
+from typing import Any, Dict, Iterable, List, Optional, Set, Tuple
 from urllib.parse import urljoin
 
 import pandas as pd
@@ -70,15 +71,14 @@ class SupremeCourtScraper:
     """Scraper class that manages state, requests, parsing, and persistence."""
 
     def __init__(self) -> None:
+        self.fetch_mode = str(getattr(config, "FETCH_MODE", "requests")).strip().lower() or "requests"
         self.session = requests.Session()
-        self.session.headers.update(
-            {
-                "User-Agent": config.USER_AGENT,
-                "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
-                "Accept-Language": "en-US,en;q=0.9",
-                "Connection": "keep-alive",
-            }
-        )
+        self.session.headers.update(self.build_default_headers())
+        self.apply_configured_cookie_header()
+        self.playwright_manager: Optional[Any] = None
+        self.playwright_browser: Optional[Any] = None
+        self.playwright_context: Optional[Any] = None
+        self.playwright_page: Optional[Any] = None
 
         self.progress = self.load_progress()
         self.processed_case_urls: Set[str] = set(self.progress.get("processed_case_urls", []))
@@ -88,18 +88,242 @@ class SupremeCourtScraper:
         config.OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
         self.ensure_failed_cases_csv_exists()
 
+    @staticmethod
+    def build_default_headers() -> Dict[str, str]:
+        """Build base headers, with optional extra browser-like headers."""
+        headers = {
+            "User-Agent": config.USER_AGENT,
+            "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+            "Accept-Language": "en-US,en;q=0.9",
+            "Connection": "keep-alive",
+        }
+        if config.ENABLE_EXTRA_HEADERS:
+            headers.update(config.EXTRA_HEADERS)
+        return headers
+
+    def apply_configured_cookie_header(self) -> None:
+        """Optionally reuse a browser cookie header copied from DevTools."""
+        cookie_header = str(getattr(config, "COOKIE_HEADER", "") or "").strip()
+        if not cookie_header:
+            return
+
+        self.session.headers["Cookie"] = cookie_header
+        logging.info("Applied configured browser cookie header to session")
+
+    def initialize_fetcher(self) -> None:
+        """Initialize optional browser-backed fetch machinery."""
+        if self.fetch_mode == "requests":
+            logging.info("Fetch mode: requests")
+            return
+
+        if self.fetch_mode != "playwright":
+            raise ValueError(f"Unsupported fetch mode: {self.fetch_mode}")
+
+        try:
+            from playwright.sync_api import sync_playwright
+        except ImportError as exc:
+            raise RuntimeError(
+                "Playwright fetch mode requires the 'playwright' package. "
+                "Install dependencies with 'pip install -r requirements.txt' and run "
+                "'python -m playwright install chromium'."
+            ) from exc
+
+        self.playwright_manager = sync_playwright().start()
+        extra_headers = {
+            key: value
+            for key, value in self.session.headers.items()
+            if key.lower() not in {"host", "content-length"}
+        }
+        launch_kwargs = {
+            "headless": bool(getattr(config, "PLAYWRIGHT_HEADLESS", True)),
+        }
+        browser_channel = str(getattr(config, "PLAYWRIGHT_BROWSER_CHANNEL", "") or "").strip()
+        if browser_channel:
+            launch_kwargs["channel"] = browser_channel
+
+        if bool(getattr(config, "PLAYWRIGHT_USE_PERSISTENT_CONTEXT", False)):
+            try:
+                self.playwright_context = self.launch_persistent_context(launch_kwargs, extra_headers, browser_channel)
+                self.playwright_browser = self.playwright_context.browser
+            except Exception as exc:  # pylint: disable=broad-except
+                if not bool(getattr(config, "PLAYWRIGHT_FALLBACK_TO_NON_PERSISTENT", True)):
+                    raise
+                logging.warning(
+                    "Persistent Playwright context failed (%s). Falling back to a fresh non-persistent browser session.",
+                    exc,
+                )
+                self.playwright_browser = self.playwright_manager.chromium.launch(**launch_kwargs)
+                self.playwright_context = self.playwright_browser.new_context(
+                    user_agent=self.session.headers.get("User-Agent", config.USER_AGENT),
+                    extra_http_headers=extra_headers,
+                    locale=str(getattr(config, "PLAYWRIGHT_LOCALE", "en-US")),
+                    timezone_id=str(getattr(config, "PLAYWRIGHT_TIMEZONE_ID", "Asia/Kolkata")),
+                    viewport={"width": 1440, "height": 900},
+                )
+        else:
+            self.playwright_browser = self.playwright_manager.chromium.launch(**launch_kwargs)
+            self.playwright_context = self.playwright_browser.new_context(
+                user_agent=self.session.headers.get("User-Agent", config.USER_AGENT),
+                extra_http_headers=extra_headers,
+                locale=str(getattr(config, "PLAYWRIGHT_LOCALE", "en-US")),
+                timezone_id=str(getattr(config, "PLAYWRIGHT_TIMEZONE_ID", "Asia/Kolkata")),
+                viewport={"width": 1440, "height": 900},
+            )
+
+        self.playwright_context.add_init_script(
+            """
+            Object.defineProperty(navigator, 'webdriver', {get: () => undefined});
+            window.chrome = window.chrome || { runtime: {} };
+            Object.defineProperty(navigator, 'languages', {get: () => ['en-US', 'en']});
+            Object.defineProperty(navigator, 'plugins', {get: () => [1, 2, 3, 4]});
+            """
+        )
+        self.playwright_page = self.playwright_context.new_page()
+        self.playwright_page.set_default_navigation_timeout(
+            int(getattr(config, "PLAYWRIGHT_NAVIGATION_TIMEOUT_MS", 30_000))
+        )
+        logging.info(
+            "Fetch mode: playwright | headless=%s | channel=%s | persistent=%s",
+            bool(getattr(config, "PLAYWRIGHT_HEADLESS", True)),
+            browser_channel or "chromium",
+            bool(getattr(config, "PLAYWRIGHT_USE_PERSISTENT_CONTEXT", True)),
+        )
+
+    def launch_persistent_context(
+        self,
+        launch_kwargs: Dict[str, Any],
+        extra_headers: Dict[str, str],
+        browser_channel: str,
+    ) -> Any:
+        """Launch a persistent browser context with a browser-specific profile path."""
+        if browser_channel == "msedge":
+            profile_dir = Path(getattr(config, "PLAYWRIGHT_EDGE_PROFILE_DIR", Path(".playwright-edge-profile")))
+        else:
+            profile_dir = Path(getattr(config, "PLAYWRIGHT_PROFILE_DIR", Path(".playwright-chromium-profile")))
+
+        profile_dir.mkdir(parents=True, exist_ok=True)
+        return self.playwright_manager.chromium.launch_persistent_context(
+            str(profile_dir),
+            user_agent=self.session.headers.get("User-Agent", config.USER_AGENT),
+            extra_http_headers=extra_headers,
+            locale=str(getattr(config, "PLAYWRIGHT_LOCALE", "en-US")),
+            timezone_id=str(getattr(config, "PLAYWRIGHT_TIMEZONE_ID", "Asia/Kolkata")),
+            viewport={"width": 1440, "height": 900},
+            **launch_kwargs,
+        )
+
+    def close(self) -> None:
+        """Release browser resources when Playwright mode is used."""
+        if self.playwright_page is not None:
+            self.playwright_page.close()
+            self.playwright_page = None
+        if self.playwright_context is not None:
+            self.playwright_context.close()
+            self.playwright_context = None
+        if self.playwright_browser is not None:
+            self.playwright_browser.close()
+            self.playwright_browser = None
+        if self.playwright_manager is not None:
+            self.playwright_manager.stop()
+            self.playwright_manager = None
+
+    @staticmethod
+    def sleep_request_delay() -> None:
+        """Sleep between requests, with optional random jitter."""
+        delay = config.REQUEST_DELAY_SECONDS
+        if config.RANDOMIZE_DELAY:
+            jitter = max(0.0, config.REQUEST_DELAY_JITTER_SECONDS)
+            delay += random.uniform(-jitter, jitter)
+            delay = max(0.0, delay)
+        time.sleep(delay)
+
+    def warmup_session(self) -> None:
+        """Run optional warm-up requests to seed session cookies and server context."""
+        if not config.WARMUP_ENABLED:
+            return
+
+        urls = [u for u in config.WARMUP_URLS if str(u).strip()]
+        if not urls:
+            return
+
+        logging.info("Starting warm-up flow with %s URL(s)", len(urls))
+        for i, url in enumerate(urls, start=1):
+            try:
+                response = self.fetch_url(url)
+                logging.info(
+                    "Warm-up request %s/%s: %s -> HTTP %s",
+                    i,
+                    len(urls),
+                    url,
+                    response.status_code,
+                )
+            except Exception as exc:  # pylint: disable=broad-except
+                logging.warning("Warm-up request failed: %s | %s", url, exc)
+            self.sleep_request_delay()
+
     # -----------------------------
     # HTTP helpers
     # -----------------------------
+    def fetch_url(self, url: str) -> requests.Response:
+        """Fetch a URL using either requests or Playwright."""
+        if self.fetch_mode == "playwright":
+            return self.fetch_url_with_playwright(url)
+        return self.session.get(url, timeout=config.REQUEST_TIMEOUT)
+
+    def fetch_url_with_playwright(self, url: str) -> requests.Response:
+        """Load a page in Chromium and convert it to a Response-like object."""
+        if self.playwright_page is None:
+            raise RuntimeError("Playwright page is not initialized")
+
+        response = self.playwright_page.goto(url, wait_until="domcontentloaded")
+        if response is None:
+            raise RuntimeError(f"No navigation response received for {url}")
+
+        try:
+            self.playwright_page.wait_for_load_state("networkidle", timeout=5_000)
+        except Exception:  # pylint: disable=broad-except
+            pass
+
+        if (
+            response.status >= 400
+            and not bool(getattr(config, "PLAYWRIGHT_HEADLESS", True))
+            and bool(getattr(config, "PLAYWRIGHT_WAIT_FOR_MANUAL_OK_ON_BLOCK", False))
+        ):
+            logging.warning(
+                "Playwright received HTTP %s for %s. Complete any manual challenge in the browser window, then press Enter to continue.",
+                response.status,
+                url,
+            )
+            input()
+            response = self.playwright_page.goto(self.playwright_page.url, wait_until="domcontentloaded")
+            if response is None:
+                raise RuntimeError(f"No navigation response received after manual intervention for {url}")
+            try:
+                self.playwright_page.wait_for_load_state("networkidle", timeout=5_000)
+            except Exception:  # pylint: disable=broad-except
+                pass
+
+        html = self.playwright_page.content()
+        request = requests.Request("GET", url, headers=dict(self.session.headers)).prepare()
+        adapted = requests.Response()
+        adapted.status_code = response.status
+        adapted.url = self.playwright_page.url
+        adapted._content = html.encode("utf-8")  # type: ignore[attr-defined]
+        adapted.encoding = "utf-8"
+        adapted.headers = requests.structures.CaseInsensitiveDict(response.headers)
+        adapted.request = request
+        adapted.reason = response.status_text
+        return adapted
+
     def get_soup(self, url: str) -> Optional[BeautifulSoup]:
         """Fetch URL with retry + exponential backoff, then return BeautifulSoup."""
         for attempt in range(config.MAX_RETRIES + 1):
             try:
-                response = self.session.get(url, timeout=config.REQUEST_TIMEOUT)
+                response = self.fetch_url(url)
                 response.raise_for_status()
-                time.sleep(config.REQUEST_DELAY_SECONDS)
+                self.sleep_request_delay()
                 return BeautifulSoup(response.text, "html.parser")
-            except requests.RequestException as exc:
+            except Exception as exc:  # pylint: disable=broad-except
                 if attempt >= config.MAX_RETRIES:
                     logging.error("Request failed permanently: %s | %s", url, exc)
                     return None
@@ -505,6 +729,11 @@ def parse_args() -> argparse.Namespace:
             "Useful when the root page returns 403."
         ),
     )
+    parser.add_argument(
+        "--fetch-mode",
+        choices=["requests", "playwright"],
+        help="Choose page loading backend. Use 'playwright' when requests receives 403.",
+    )
 
     return parser.parse_args()
 
@@ -534,40 +763,47 @@ def main() -> None:
     setup_logging()
     args = parse_args()
     scraper = SupremeCourtScraper()
+    if args.fetch_mode:
+        scraper.fetch_mode = args.fetch_mode
 
-    logging.info("Scraper started")
+    try:
+        scraper.initialize_fetcher()
+        scraper.warmup_session()
 
-    if args.retry_failed:
-        scraper.retry_failed_cases()
-        logging.info("Retry-failed mode complete")
-        return
+        logging.info("Scraper started")
 
-    target_years = determine_target_years(args, scraper)
-    if not target_years:
-        logging.info("No target years to process.")
-        return
+        if args.retry_failed:
+            scraper.retry_failed_cases()
+            logging.info("Retry-failed mode complete")
+            return
 
-    year_links: Dict[int, str] = {}
-    if args.skip_year_discovery:
-        logging.info(
-            "Skipping browse root discovery by CLI flag; using direct year URLs only."
-        )
-    else:
-        year_links = scraper.extract_year_links()
-        if year_links:
-            logging.info("Discovered %s year links from browse page", len(year_links))
-        else:
-            logging.warning(
-                "Could not discover year links from %s. Falling back to direct year URLs.",
-                config.BASE_BROWSE_URL,
+        target_years = determine_target_years(args, scraper)
+        if not target_years:
+            logging.info("No target years to process.")
+            return
+
+        year_links: Dict[int, str] = {}
+        if args.skip_year_discovery:
+            logging.info(
+                "Skipping browse root discovery by CLI flag; using direct year URLs only."
             )
+        else:
+            year_links = scraper.extract_year_links()
+            if year_links:
+                logging.info("Discovered %s year links from browse page", len(year_links))
+            else:
+                logging.warning(
+                    "Could not discover year links from %s. Falling back to direct year URLs.",
+                    config.BASE_BROWSE_URL,
+                )
 
-    for year in target_years:
-        year_url = year_links.get(year) or scraper.build_year_url(year)
+        for year in target_years:
+            year_url = year_links.get(year) or scraper.build_year_url(year)
+            scraper.scrape_year(year, year_url)
 
-        scraper.scrape_year(year, year_url)
-
-    logging.info("Scraper finished")
+        logging.info("Scraper finished")
+    finally:
+        scraper.close()
 
 
 if __name__ == "__main__":

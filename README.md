@@ -5,6 +5,7 @@ A production-oriented, restartable Python scraper that collects **Supreme Court 
 - Start page: `https://indiankanoon.org/browse/supremecourt/`
 - Supports year batching, resume, failed-case retry, and duplicate-safe incremental Excel writing.
 - Extracts only metadata above the judgment content rectangle.
+- Supports optional warm-up requests, optional extra headers, randomized per-request delay jitter, and Playwright-based browser fetching.
 
 ## What this scraper extracts per case
 
@@ -67,6 +68,7 @@ source .venv/bin/activate
 ```bash
 pip install --upgrade pip
 pip install -r requirements.txt
+python -m playwright install chromium
 ```
 
 ### 4) Run scraper (examples)
@@ -77,6 +79,7 @@ python scraper.py --start-year 1950 --end-year 1955
 python scraper.py --resume
 python scraper.py --retry-failed
 python scraper.py --years 1950 --skip-year-discovery
+python scraper.py --years 1950 --skip-year-discovery --fetch-mode playwright
 ```
 
 ## Batch execution modes
@@ -156,6 +159,63 @@ python scraper.py --years 1950 --skip-year-discovery
 
 Keeping a browser tab open does not help this script because it uses its own `requests.Session` (separate cookies/session from your browser).
 
+If the site allows access in your browser but blocks the script, you can now copy the browser request's `Cookie` header into `config.py` as `COOKIE_HEADER`. That lets the scraper reuse the browser-validated session inside its own `requests.Session`.
+
+If direct requests continue returning `403`, switch to the browser-backed fetcher:
+
+```bash
+python scraper.py --years 1950 --skip-year-discovery --fetch-mode playwright
+```
+
+That mode navigates pages in Chromium via Playwright, then feeds the rendered HTML into the existing parser/output pipeline.
+
+If the site shows a Cloudflare verification page, the verification flow itself may be blocked by a browser extension, VPN, DNS filter, firewall rule, or network policy. The current default `config.py` uses a clean visible Playwright Chromium session and disables warm-up requests to reduce those conflicts.
+
+If you still want to try real Edge instead, use this setup in `config.py`:
+
+```python
+FETCH_MODE = "playwright"
+PLAYWRIGHT_BROWSER_CHANNEL = "msedge"
+PLAYWRIGHT_HEADLESS = False
+PLAYWRIGHT_USE_PERSISTENT_CONTEXT = True
+PLAYWRIGHT_WAIT_FOR_MANUAL_OK_ON_BLOCK = True
+```
+
+Then run:
+
+```bash
+python scraper.py --years 1950 --skip-year-discovery
+```
+
+With the current default `config.py`, this opens a visible Playwright Chromium session and allows a manual verification step before the scraper retries the blocked navigation.
+
+If you choose to re-enable persistent browser profiles later, keep Chromium and Edge in separate profile folders. This project now defaults to:
+
+- `.playwright-chromium-profile` for Chromium-based Playwright sessions
+- `.playwright-edge-profile` for Edge sessions
+
+That avoids the `edge://resources/*` profile corruption issue that can crash Chromium at startup.
+
+If you see a message about `challenges.cloudflare.com` being blocked, check these before rerunning:
+
+- Turn off ad blockers, privacy extensions, or script blockers in your normal browser.
+- Disable VPN, proxy, Pi-hole, NextDNS, Little Snitch, or similar filtering temporarily.
+- Try a different network, such as mobile hotspot, if your current network blocks Cloudflare challenge traffic.
+- If your firewall or DNS tooling is managed by your workplace, the scraper cannot bypass that in code.
+
+## Optional anti-blocking knobs
+
+To reduce bot-like request patterns, this scraper includes optional controls in `config.py`:
+
+- `ENABLE_EXTRA_HEADERS` + `EXTRA_HEADERS` for additional browser-like headers.
+- `COOKIE_HEADER` to reuse cookies copied from a browser request.
+- `RANDOMIZE_DELAY` + `REQUEST_DELAY_JITTER_SECONDS` to randomize inter-request wait time.
+- `WARMUP_ENABLED` + `WARMUP_URLS` to make pre-crawl warm-up requests before year discovery and scraping.
+- `FETCH_MODE`, `PLAYWRIGHT_HEADLESS`, and `PLAYWRIGHT_NAVIGATION_TIMEOUT_MS` to control browser-backed fetching.
+- `PLAYWRIGHT_BROWSER_CHANNEL`, `PLAYWRIGHT_USE_PERSISTENT_CONTEXT`, `PLAYWRIGHT_PROFILE_DIR`, `PLAYWRIGHT_EDGE_PROFILE_DIR`, `PLAYWRIGHT_FALLBACK_TO_NON_PERSISTENT`, `PLAYWRIGHT_LOCALE`, `PLAYWRIGHT_TIMEZONE_ID`, and `PLAYWRIGHT_WAIT_FOR_MANUAL_OK_ON_BLOCK` for browser selection, optional persistent profiles, and manual unblock behavior.
+
+These do not guarantee bypassing 403 responses, but they can improve resilience in some environments.
+
 ## Config customization
 
 Edit `config.py` for defaults such as:
@@ -172,7 +232,7 @@ CLI arguments always override year defaults from config.
 Start with one year to validate environment and output shape:
 
 ```bash
-python scraper.py --years 1950
+python scraper.py --years 1950 --skip-year-discovery
 ```
 
 Then inspect:
